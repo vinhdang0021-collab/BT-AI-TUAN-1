@@ -1,0 +1,27 @@
+import osmnx as ox
+import networkx as nx
+import matplotlib.pyplot as plt
+import time
+place_name = "District 1, Ho Chi Minh City, Vietnam"
+G = ox.graph_from_place(place_name, network_type='drive')
+nodes = list(G.nodes)
+orig_node = nodes[0] 
+dest_node = nodes[len(nodes)//2] 
+start_d = time.time()
+route_dijkstra = nx.shortest_path(G, orig_node, dest_node, weight='length', method='dijkstra')
+end_d = time.time() - start_d
+def heuristic(u, v):
+    x1, y1 = G.nodes[u]['x'], G.nodes[u]['y']
+    x2, y2 = G.nodes[v]['x'], G.nodes[v]['y']
+    return ((x1 - x2)**2 + (y1 - y2)**2)**0.5
+
+start_a = time.time()
+route_astar = nx.astar_path(G, orig_node, dest_node, weight='length', heuristic=heuristic)
+end_a = time.time() - start_a
+print(f"Dijkstra chạy trong: {end_d:.6f} giây")
+print(f"A* chạy trong:       {end_a:.6f} giây")
+print(f"Độ dài đường đi:     {nx.shortest_path_length(G, orig_node, dest_node, weight='length'):.2f} mét")
+
+fig, ax = ox.plot_graph_route(G, route_dijkstra, route_color='r', route_linewidth=5, node_size=0, show=False, close=False)
+ox.plot_graph_route(G, route_astar, route_color='b', route_linewidth=2, node_size=0, ax=ax)
+plt.show()
