@@ -1,0 +1,40 @@
+import folium
+import numpy as np
+import pandas as pd
+from scipy.spatial import distance
+np.random.seed(10)
+depots = np.array([[10.7626, 106.6602], [10.7961, 106.7032]]) 
+delivery_points = 10.75 + np.random.rand(10, 2) * 0.08
+def solve_vrp(depots, points):
+    routes = []
+    unvisited = list(range(len(points)))
+    
+    for start_node in depots:
+        current_route = [start_node]
+        current_pos = start_node
+        
+        while unvisited:
+            dists = [distance.euclidean(current_pos, points[i]) for i in unvisited]
+            closest_idx = np.argmin(dists)
+            closest_point = points[unvisited[closest_idx]]
+            current_route.append(closest_point)
+            current_pos = closest_point
+            unvisited.pop(closest_idx)
+            
+            if len(current_route) > 5:
+                break
+        
+        current_route.append(start_node) 
+        routes.append(current_route)
+    return routes
+routes = solve_vrp(depots, delivery_points)
+m = folium.Map(location=[10.7769, 106.68], zoom_start=13)
+colors = ['red', 'blue']
+for i, depot in enumerate(depots):
+    folium.Marker(depot, popup=f"KHO {i+1}", icon=folium.Icon(color='black', icon='building', prefix='fa')).add_to(m)
+for i, route in enumerate(routes):
+    folium.PolyLine(route, color=colors[i], weight=4, opacity=0.7, popup=f"Tuyến xe {i+1}").add_to(m)
+    for pt in route[1:-1]:
+        folium.CircleMarker(pt, radius=5, color=colors[i], fill=True).add_to(m)
+
+m
