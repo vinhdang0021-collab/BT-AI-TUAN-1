@@ -1,0 +1,29 @@
+!pip install geopandas folium requests
+import geopandas as gpd
+import pandas as pd
+import folium
+import requests
+url = "https://geodata.ucdavis.edu/gadm/gadm4.1/json/gadm41_VNM_1.json"
+r = requests.get(url)
+with open("vn_provinces.geojson", "wb") as f:
+    f.write(r.content)
+gdf = gpd.read_file("vn_provinces.geojson")
+print(gdf.columns)
+data = {
+    "NAME_1": ["Ho Chi Minh", "Ha Noi", "Da Nang", "Can Tho", "Binh Duong"],
+    "population": [9000000, 8000000, 1200000, 1600000, 2500000]
+}
+df = pd.DataFrame(data)
+gdf = gdf.merge(df, on="NAME_1", how="left")
+m = folium.Map(location=[16, 108], zoom_start=5)
+folium.Choropleth(
+    geo_data=gdf,
+    data=gdf,
+    columns=["NAME_1", "population"],
+    key_on="feature.properties.NAME_1",
+    fill_color="YlOrRd",
+    fill_opacity=0.7,
+    line_opacity=0.2,
+    legend_name="Dân số (giả lập)"
+).add_to(m)
+m
