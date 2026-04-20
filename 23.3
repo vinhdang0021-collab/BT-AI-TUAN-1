@@ -1,0 +1,13 @@
+!pip install folium
+import folium
+from folium.plugins import HeatMap
+import random
+center = [10.762622, 106.682231]
+m = folium.Map(location=center, zoom_start=13)
+data = []
+for i in range(50):
+    lat = center[0] + random.uniform(-0.02, 0.02)  # dao động nhỏ quanh trung tâm
+    lon = center[1] + random.uniform(-0.02, 0.02)
+    data.append([lat, lon])
+HeatMap(data).add_to(m)
+m
