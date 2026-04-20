@@ -1,0 +1,22 @@
+!pip install folium
+import folium
+m = folium.Map(location=[10.762622, 106.682231], zoom_start=13)
+points = folium.FeatureGroup(name="Điểm")
+folium.Marker([10.7769, 106.7009], popup="UBND Quận 1", icon=folium.Icon(color="red")).add_to(points)
+folium.Marker([10.7546, 106.6636], popup="Bệnh viện Chợ Rẫy", icon=folium.Icon(color="green")).add_to(points)
+points.add_to(m)
+polygon = folium.FeatureGroup(name="Vùng nguy cơ")
+folium.Polygon(
+    locations=[[10.7700,106.6800],[10.7750,106.6850],[10.7800,106.6800]],
+    color="orange", fill=True, fill_opacity=0.4, popup="Khu vực nguy cơ"
+).add_to(polygon)
+polygon.add_to(m)
+
+lines = folium.FeatureGroup(name="Tuyến đường")
+folium.PolyLine(
+    locations=[[10.7769,106.7009],[10.7546,106.6636]],
+    color="blue", weight=3, popup="Tuyến kết nối"
+).add_to(lines)
+lines.add_to(m)
+folium.LayerControl().add_to(m)
+m
