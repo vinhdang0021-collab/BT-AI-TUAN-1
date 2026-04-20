@@ -1,0 +1,21 @@
+!pip install osmnx folium
+import osmnx as ox
+import networkx as nx
+import folium
+place = "District 1, Ho Chi Minh City, Vietnam"
+G = ox.graph_from_place(place, network_type="drive")
+betweenness = nx.betweenness_centrality(G, weight="length", normalized=True)
+closeness = nx.closeness_centrality(G, distance="length")
+degree = nx.degree_centrality(G)
+important_node = max(betweenness, key=betweenness.get)
+coords = (G.nodes[important_node]["y"], G.nodes[important_node]["x"])
+print("Nút quan trọng nhất (theo betweenness):", important_node)
+print("Tọa độ:", coords)
+m = folium.Map(location=coords, zoom_start=15)
+folium.Marker(coords, popup="Nút quan trọng nhất", icon=folium.Icon(color="red")).add_to(m)
+edges = ox.graph_to_gdfs(G, nodes=False, edges=True)
+for _, row in edges.iterrows():
+    folium.PolyLine([(row["geometry"].coords[0][1], row["geometry"].coords[0][0]),
+                     (row["geometry"].coords[-1][1], row["geometry"].coords[-1][0])],
+                    color="blue", weight=1, opacity=0.5).add_to(m)
+m
