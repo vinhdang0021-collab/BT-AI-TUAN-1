@@ -1,0 +1,14 @@
+!pip install osmnx folium
+import osmnx as ox
+import networkx as nx
+place = "Quận 1, Hồ Chí Minh, Vietnam"
+G = ox.graph_from_place(place, network_type="drive")
+ox.plot_graph(G)
+nodes, edges = ox.graph_to_gdfs(G)
+area_km2 = edges.unary_union.convex_hull.area / 1e6  # diện tích bao quanh mạng lưới
+node_density = len(nodes) / area_km2
+avg_edge_length = edges["length"].mean()
+avg_degree = sum(dict(G.degree()).values()) / len(G.nodes)
+print("Mật độ nút:", round(node_density, 2), "nút/km2")
+print("Chiều dài trung bình cạnh:", round(avg_edge_length, 2), "m")
+print("Độ kết nối mạng trung bình:", round(avg_degree, 2))
