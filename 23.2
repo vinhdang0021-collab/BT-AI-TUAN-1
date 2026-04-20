@@ -1,0 +1,35 @@
+!pip install geopy folium
+import folium
+from geopy.geocoders import Nominatim
+from geopy.distance import geodesic
+geolocator = Nominatim(user_agent="geo_exercise")
+addresses = [
+    "Đại học UEH, TP.HCM",
+    "Bệnh viện Chợ Rẫy, TP.HCM",
+    "Vincom Center, TP.HCM",
+    "Ga Sài Gòn, TP.HCM",
+    "Bến xe Miền Đông, TP.HCM",
+    "UBND Quận 1, TP.HCM",
+    "Đại học Bách Khoa, TP.HCM",
+    "Đại học Kinh tế Luật, TP.HCM",
+    "Sân bay Tân Sơn Nhất, TP.HCM",
+    "Thảo Cầm Viên, TP.HCM"
+]
+locations = []
+for addr in addresses:
+    loc = geolocator.geocode(addr)
+    if loc:
+        locations.append({"name": addr, "coords": (loc.latitude, loc.longitude)})
+center = locations[0]["coords"]
+m = folium.Map(location=center, zoom_start=13)
+for place in locations:
+    folium.Marker(
+        location=place["coords"],
+        popup=place["name"],
+        icon=folium.Icon(color="blue", icon="info-sign")
+    ).add_to(m)
+ueh_coords = locations[0]["coords"]
+for place in locations[1:]:
+    dist = geodesic(ueh_coords, place["coords"]).km
+    print(f"Khoảng cách từ UEH đến {place['name']}: {dist:.2f} km")
+m
