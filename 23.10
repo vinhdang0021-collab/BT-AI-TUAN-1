@@ -1,0 +1,34 @@
+import folium
+center = [10.762622, 106.682231]
+m = folium.Map(location=center, zoom_start=13)
+roads = [
+    {"name": "Trường Sa", "coords": [10.7900, 106.6900], "flow": 1200, "speed": 15},
+    {"name": "Điện Biên Phủ", "coords": [10.8000, 106.7000], "flow": 800, "speed": 25},
+    {"name": "Cách Mạng Tháng 8", "coords": [10.7700, 106.6800], "flow": 400, "speed": 40}
+]
+
+def risk_level(flow, speed):
+    if flow > 1000 and speed < 20:
+        return "high"
+    elif flow > 600 and speed < 30:
+        return "medium"
+    else:
+        return "low"
+for r in roads:
+    level = risk_level(r["flow"], r["speed"])
+    color = "red" if level == "high" else "orange" if level == "medium" else "green"
+    folium.CircleMarker(
+        location=r["coords"],
+        radius=15,
+        color=color,
+        fill=True,
+        fill_opacity=0.6,
+        popup=f"{r['name']} - Nguy cơ: {level}"
+    ).add_to(m)
+folium.PolyLine(
+    locations=[roads[2]["coords"], roads[1]["coords"]],
+    color="blue",
+    weight=3,
+    popup="Tuyến thay thế"
+).add_to(m)
+m
