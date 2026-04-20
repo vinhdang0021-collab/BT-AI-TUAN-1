@@ -1,0 +1,33 @@
+import pandas as pd
+import numpy as np
+import folium
+from sklearn.cluster import KMeans
+np.random.seed(42)
+center_hcm = [10.7769, 106.7009]
+data = {
+    'lat': 10.75 + np.random.rand(100) * 0.1,
+    'lon': 106.65 + np.random.rand(100) * 0.1
+}
+df = pd.DataFrame(data)
+n_hubs = 3
+kmeans = KMeans(n_clusters=n_hubs, n_init=10, random_state=0).fit(df[['lat', 'lon']])
+hubs = kmeans.cluster_centers_
+df['cluster'] = kmeans.labels_
+m = folium.Map(location=center_hcm, zoom_start=12)
+colors = ['red', 'blue', 'green', 'purple', 'orange']
+for idx, row in df.iterrows():
+    folium.CircleMarker(
+        location=[row['lat'], row['lon']],
+        radius=3,
+        color=colors[int(row['cluster'])],
+        fill=True,
+        fill_opacity=0.6
+    ).add_to(m)
+for i, hub in enumerate(hubs):
+    folium.Marker(
+        location=[hub[0], hub[1]],
+        popup=f"Vị trí KHO HÀNG {i+1} tối ưu",
+        icon=folium.Icon(color='black', tooltip="Click vào")
+    ).add_to(m)
+
+m
