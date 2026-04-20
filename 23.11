@@ -1,0 +1,28 @@
+!pip install folium scikit-learn
+import folium
+from sklearn.linear_model import LinearRegression
+center = [10.762622, 106.682231]
+m = folium.Map(location=center, zoom_start=13)
+areas = [
+    {"name": "Quận 1", "coords": [10.7769, 106.7009], "demand": [50, 120, 200]},
+    {"name": "Quận 3", "coords": [10.7790, 106.6900], "demand": [30, 80, 150]},
+    {"name": "Quận 5", "coords": [10.7546, 106.6636], "demand": [20, 60, 100]}
+]
+X, y = [], []
+for i, area in enumerate(areas):
+    for t, d in enumerate(area["demand"]): 
+        X.append([i, t])
+        y.append(d)
+        
+model = LinearRegression().fit(X, y)
+for i, area in enumerate(areas):
+    pred = model.predict([[i, 2]])[0]
+    folium.CircleMarker(
+        location=area["coords"],
+        radius=pred/20,  # kích thước theo nhu cầu
+        color="blue",
+        fill=True,
+        fill_opacity=0.6,
+        popup=f"{area['name']} - Nhu cầu dự đoán: {int(pred)}"
+    ).add_to(m)
+m
