@@ -1,0 +1,18 @@
+!pip install folium shapely
+import folium
+from shapely.geometry import Point
+from shapely.geometry import Polygon
+center = [10.762622, 106.682231]
+m = folium.Map(location=center, zoom_start=13)
+folium.Marker(center, popup="Kho hàng trung tâm", icon=folium.Icon(color="red")).add_to(m)
+radii = [3000, 5000, 10000] 
+for r in radii:
+    folium.Circle(
+        location=center,
+        radius=r,
+        color="blue",
+        fill=True,
+        fill_opacity=0.1,
+        popup=f"Phạm vi {r/1000} km"
+    ).add_to(m)
+m
